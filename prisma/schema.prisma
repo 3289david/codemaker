@@ -1,0 +1,402 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// NOTE: SQLite has no native enum support in Prisma, so all "enum-like"
+// fields below are plain String columns. Allowed values are documented
+// as constants in src/lib/constants.ts — treat that file as the source
+// of truth and validate against it at the application layer.
+
+// ─────────────────────────────────────────────────────────────
+// 고객 / 인증
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id               String    @id @default(cuid())
+  email            String    @unique
+  passwordHash     String
+  nickname         String
+  phone            String?
+  discordId        String?
+  profileImage     String?
+  status           String    @default("ACTIVE") // ACTIVE | SUSPENDED | WITHDRAWN
+  suspendedReason  String?
+  emailVerified    Boolean   @default(false)
+  emailVerifyToken String?
+  isSeedData       Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  orders        Order[]
+  reviews       Review[]
+  inquiries     Inquiry[]
+  notifications Notification[]
+  sessions      UserSession[]
+  messages      Message[]
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  ip        String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────
+// 관리자
+// ─────────────────────────────────────────────────────────────
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  loginId      String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("STAFF") // SUPER | MANAGER | STAFF
+  status       String   @default("ACTIVE") // ACTIVE | DISABLED
+  totpSecret   String?
+  totpEnabled  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  loginLogs      AdminLoginLog[]
+  activityLogs   AdminActivityLog[]
+  sessions       AdminSession[]
+  assignedOrders Order[]           @relation("AssignedAdmin")
+  messages       Message[]
+}
+
+model AdminSession {
+  id        String    @id @default(cuid())
+  adminId   String
+  admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  ip        String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+}
+
+model AdminLoginLog {
+  id        String     @id @default(cuid())
+  adminId   String?
+  admin     AdminUser? @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  loginId   String
+  ip        String?
+  userAgent String?
+  success   Boolean
+  reason    String?
+  createdAt DateTime   @default(now())
+}
+
+model AdminActivityLog {
+  id        String    @id @default(cuid())
+  adminId   String
+  admin     AdminUser @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action    String
+  target    String?
+  detail    String?
+  ip        String?
+  createdAt DateTime  @default(now())
+}
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  scope     String // ADMIN | USER
+  key       String // loginId or email or ip
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────
+// 서비스 / 가격 산정
+// ─────────────────────────────────────────────────────────────
+
+model Service {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  category     String // WEBSITE | WEBAPP | DISCORD_BOT | CHROME_EXT | API | AUTOMATION | AI | DB | ADMIN_PAGE | MAINTENANCE | CUSTOM
+  name         String
+  summary      String
+  description  String
+  capabilities String // JSON array of strings
+  priceMin     Int
+  priceMax     Int
+  durationMin  Int // days
+  durationMax  Int // days
+  icon         String? // emoji
+  active       Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// 견적 계산기에서 사용하는 기능별 가격/기간 가중치. 관리자가 편집 가능.
+model PricingRule {
+  id        String   @id @default(cuid())
+  key       String   @unique // LOGIN, SIGNUP, DB, ADMIN, PAYMENT, API, AI, UPLOAD, EMAIL, DISCORD, OAUTH, SEARCH, BOARD ...
+  label     String
+  category  String   @default("FEATURE") // BASE | FEATURE
+  price     Int // 추가 금액
+  days      Int // 추가 기간(일)
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 제작 종류별 기본 금액/기간 (BASE 가중치)
+model ProjectTypeRule {
+  id        String   @id @default(cuid())
+  key       String   @unique // WEBSITE | WEBAPP | PROGRAM | BOT | API | ETC
+  label     String
+  basePrice Int
+  baseDays  Int
+  active    Boolean  @default(true)
+  sortOrder Int      @default(0)
+}
+
+// ─────────────────────────────────────────────────────────────
+// 포트폴리오 / 리뷰 / 공지 / FAQ / 문의
+// ─────────────────────────────────────────────────────────────
+
+model Portfolio {
+  id          String   @id @default(cuid())
+  title       String
+  category    String
+  description String
+  images      String // JSON array of upload keys or urls
+  techStack   String // JSON array
+  duration    String // e.g. "3주"
+  priceBand   String // e.g. "150만원대"
+  features    String // JSON array
+  liveUrl     String?
+  githubUrl   String?
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  orderId    String?  @unique
+  order      Order?   @relation(fields: [orderId], references: [id])
+  rating     Int
+  content    String
+  images     String? // JSON array
+  status     String   @default("PENDING") // PENDING | APPROVED | HIDDEN
+  adminReply String?
+  repliedAt  DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Notice {
+  id        String   @id @default(cuid())
+  category  String // SERVICE | PRICE | HOLIDAY | EVENT | MAINTENANCE
+  title     String
+  content   String
+  pinned    Boolean  @default(false)
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  category  String
+  question  String
+  answer    String
+  sortOrder Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model Inquiry {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id])
+  title             String
+  content           String
+  attachment        String?
+  status            String    @default("WAITING") // WAITING | ANSWERED
+  answer            String?
+  answeredByAdminId String?
+  answeredAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// 주문 (핵심 플로우)
+// ─────────────────────────────────────────────────────────────
+
+model Order {
+  id               String    @id @default(cuid())
+  orderNo          String    @unique // e.g. A-10291
+  userId           String?
+  user             User?     @relation(fields: [userId], references: [id])
+
+  // 비회원 주문 지원용 연락처 + PIN(공개 조회용, 해시 저장)
+  guestName        String?
+  guestEmail       String?
+  guestPhone       String?
+  guestDiscord     String?
+  pinHash          String
+
+  title            String
+  projectType      String // WEBSITE | WEBAPP | PROGRAM | BOT | API | ETC
+  description      String
+  features         String // JSON array of PricingRule keys
+  referenceUrls    String? // JSON array
+  referenceImages  String? // JSON array of upload keys
+  attachments      String? // JSON array of upload keys
+  desiredTimeline  String?
+  budget           String?
+  contactEmail     String
+  contactPhone     String?
+  contactDiscord   String?
+
+  estimatedPriceMin Int?
+  estimatedPriceMax Int?
+  estimatedDays     Int?
+
+  status           String    @default("접수") // 접수 | 견적확인 | 결제대기 | 제작중 | 검수중 | 수정중 | 완료 | 취소
+  progress         Int       @default(0)
+  dueDate          DateTime?
+  assignedAdminId  String?
+  assignedAdmin    AdminUser? @relation("AssignedAdmin", fields: [assignedAdminId], references: [id])
+  internalMemo     String?
+
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  statusHistory     OrderStatusHistory[]
+  quote             Quote?
+  payment           Payment?
+  messages          Message[]
+  revisionRequests  RevisionRequest[]
+  deliverables      Deliverable[]
+  review            Review?
+  notifications     Notification[]
+}
+
+model OrderStatusHistory {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    String
+  note      String?
+  byAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Quote {
+  id               String    @id @default(cuid())
+  orderId          String    @unique
+  order            Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount           Int
+  estimatedDays    Int
+  includedFeatures String // JSON array of strings
+  memo             String?
+  status           String    @default("DRAFT") // DRAFT | SENT | APPROVED
+  sentAt           DateTime?
+  approvedAt       DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Payment {
+  id             String    @id @default(cuid())
+  orderId        String    @unique
+  order          Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount         Int
+  method         String    @default("BANK_TRANSFER")
+  status         String    @default("PENDING") // PENDING | NOTIFIED | CONFIRMED
+  depositorName  String?
+  notifiedAt     DateTime?
+  confirmedAt    DateTime?
+  confirmedBy    String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Message {
+  id          String     @id @default(cuid())
+  orderId     String
+  order       Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  senderType  String // USER | ADMIN
+  userId      String?
+  user        User?      @relation(fields: [userId], references: [id])
+  adminId     String?
+  admin       AdminUser? @relation(fields: [adminId], references: [id])
+  content     String
+  attachments String? // JSON array of upload keys
+  pinned      Boolean    @default(false)
+  readByUser  Boolean    @default(false)
+  readByAdmin Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+}
+
+model RevisionRequest {
+  id          String    @id @default(cuid())
+  orderId     String
+  order       Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  files       String? // JSON array of upload keys
+  status      String    @default("요청확인") // 요청확인 | 수정중 | 완료
+  adminNote   String?
+  createdAt   DateTime  @default(now())
+  resolvedAt  DateTime?
+}
+
+model Deliverable {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  versionLabel String // v1.0, v1.1, Final ...
+  fileKey      String
+  fileName     String
+  size         Int
+  note         String?
+  visible      Boolean  @default(true)
+  uploadedBy   String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+}
+
+// ─────────────────────────────────────────────────────────────
+// 알림 / 설정
+// ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id                 String  @id @default("singleton")
+  companyName        String  @default("CodeMaker")
+  bankName           String  @default("카카오뱅크")
+  bankAccountNumber  String  @default("3333-00-1234567")
+  bankAccountHolder  String  @default("코드메이커(주)")
+  noticeMessage      String?
+}
