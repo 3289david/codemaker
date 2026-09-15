@@ -8,6 +8,7 @@ import { calculateEstimate } from "@/lib/pricing";
 import { notifyDiscordNewOrder } from "@/lib/discordNotify";
 import { createNotification } from "@/lib/notify";
 import { saveUploadedFile } from "@/lib/storage";
+import { getSettings } from "@/lib/settings";
 import { ORDER_STATUS, NOTIFICATION_TYPES } from "@/lib/constants";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -43,8 +44,14 @@ export async function createOrderAction(_prev: OrderFormState, formData: FormDat
   if (!title || !description || !contactEmail) {
     return { error: "제목, 상세 설명, 연락 이메일은 필수입니다." };
   }
-  if (!user && (!pin || pin.length < 4)) {
-    return { error: "비회원 주문은 4자리 이상의 조회용 PIN을 설정해야 합니다." };
+  if (!user) {
+    const settings = await getSettings();
+    if (!settings.allowGuestOrders) {
+      return { error: "현재 비회원 주문이 비활성화되어 있습니다. 로그인 후 주문해주세요." };
+    }
+    if (!pin || pin.length < 4) {
+      return { error: "비회원 주문은 4자리 이상의 조회용 PIN을 설정해야 합니다." };
+    }
   }
 
   const referenceUrls = referenceUrlsRaw
@@ -261,10 +268,18 @@ export async function createReviewAction(_prev: RevisionState, formData: FormDat
   const existing = await prisma.review.findUnique({ where: { orderId } });
   if (existing) return { error: "이미 리뷰를 작성했습니다." };
 
+  const settings = await getSettings();
+  const status = settings.autoApproveReviews ? "APPROVED" : "PENDING";
+
   await prisma.review.create({
-    data: { userId: user.id, orderId, rating: Math.min(5, Math.max(1, rating)), content, status: "PENDING" },
+    data: { userId: user.id, orderId, rating: Math.min(5, Math.max(1, rating)), content, status },
   });
 
   revalidatePath(`/mypage/orders/${orderId}`);
-  return { success: "리뷰가 등록되었습니다. 관리자 승인 후 공개됩니다." };
+  revalidatePath("/reviews");
+  return {
+    success: settings.autoApproveReviews
+      ? "리뷰가 등록되었습니다."
+      : "리뷰가 등록되었습니다. 관리자 승인 후 공개됩니다.",
+  };
 }

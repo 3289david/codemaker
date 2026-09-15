@@ -19,18 +19,24 @@ async function main() {
   });
 
   // ── 관리자 계정 ─────────────────────────────────────────────
+  // 비밀번호 로그인은 비활성화되었지만(관리자는 이제 Google OAuth로만 로그인) AdminUser
+  // row 자체는 그대로 유지한다 — email이 이 값과 일치하는 Google 계정만 관리자 세션을 받는다.
   const adminLoginId = process.env.SEED_ADMIN_ID || "admin";
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || "CodeMaker!2026";
+  const adminGoogleEmail = (process.env.ADMIN_GOOGLE_EMAIL || "davideom0414@gmail.com").toLowerCase();
   const existingAdmin = await prisma.adminUser.findUnique({ where: { loginId: adminLoginId } });
   if (!existingAdmin) {
     await prisma.adminUser.create({
       data: {
         loginId: adminLoginId,
         passwordHash: await bcrypt.hash(adminPassword, 12),
+        email: adminGoogleEmail,
         name: "최고관리자",
         role: "SUPER",
       },
     });
+  } else if (!existingAdmin.email) {
+    await prisma.adminUser.update({ where: { id: existingAdmin.id }, data: { email: adminGoogleEmail } });
   }
 
   // ── 고객 계정 ───────────────────────────────────────────────

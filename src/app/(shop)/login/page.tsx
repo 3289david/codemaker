@@ -1,17 +1,57 @@
 "use client";
 
-import { useActionState } from "react";
+import { use, useActionState } from "react";
 import Link from "next/link";
 import { loginAction, type AuthState } from "@/lib/actions/auth";
 import { SubmitButton } from "@/components/SubmitButton";
 import { FormMessage } from "@/components/ui";
 
-export default function LoginPage() {
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  oauth_state: "로그인 요청이 만료되었거나 유효하지 않습니다. 다시 시도해주세요.",
+  oauth_cancelled: "로그인이 취소되었습니다.",
+  oauth_failed: "소셜 로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
+  no_email: "소셜 계정에서 이메일 정보를 가져올 수 없습니다.",
+};
+
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error: oauthError } = use(searchParams);
   const [state, formAction] = useActionState<AuthState, FormData>(loginAction, undefined);
 
   return (
     <div className="max-w-sm mx-auto px-4 py-20">
       <h1 className="text-2xl font-bold text-center mb-6">로그인</h1>
+
+      {oauthError && (
+        <div className="mb-4">
+          <FormMessage error={OAUTH_ERROR_MESSAGES[oauthError] || "로그인 중 오류가 발생했습니다."} />
+        </div>
+      )}
+
+      <div className="space-y-2 mb-5">
+        <a
+          href="/api/auth/google"
+          className="flex items-center justify-center gap-2 w-full border border-neutral-300 rounded-md py-2.5 text-sm font-medium hover:bg-neutral-50"
+        >
+          <span aria-hidden>🔵</span> Google로 로그인
+        </a>
+        <a
+          href="/api/auth/github"
+          className="flex items-center justify-center gap-2 w-full border border-neutral-300 rounded-md py-2.5 text-sm font-medium hover:bg-neutral-50 bg-neutral-900 text-white border-neutral-900 hover:bg-neutral-800"
+        >
+          <span aria-hidden>⚫</span> GitHub로 로그인
+        </a>
+      </div>
+
+      <div className="flex items-center gap-3 mb-5 text-xs text-neutral-400">
+        <div className="h-px bg-neutral-200 flex-1" />
+        또는 이메일로 로그인
+        <div className="h-px bg-neutral-200 flex-1" />
+      </div>
+
       <form action={formAction} className="space-y-3">
         <input name="email" type="email" required placeholder="이메일" className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm" />
         <input name="password" type="password" required placeholder="비밀번호" className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm" />

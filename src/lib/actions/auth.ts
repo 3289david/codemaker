@@ -47,7 +47,7 @@ export async function loginAction(_prev: AuthState, formData: FormData): Promise
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
-  const ok = user ? await verifyPassword(password, user.passwordHash) : false;
+  const ok = user?.passwordHash ? await verifyPassword(password, user.passwordHash) : false;
   if (!user || !ok) {
     await recordLoginAttempt("USER", email || ip);
     return { error: "이메일 또는 비밀번호가 올바르지 않습니다." };

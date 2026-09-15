@@ -19,10 +19,12 @@ datasource db {
 model User {
   id               String    @id @default(cuid())
   email            String    @unique
-  passwordHash     String
+  passwordHash     String?
   nickname         String
   phone            String?
   discordId        String?
+  googleId         String?   @unique
+  githubId         String?   @unique
   profileImage     String?
   status           String    @default("ACTIVE") // ACTIVE | SUSPENDED | WITHDRAWN
   suspendedReason  String?
@@ -59,6 +61,7 @@ model AdminUser {
   id           String   @id @default(cuid())
   loginId      String   @unique
   passwordHash String
+  email        String?  @unique // Google OAuth 관리자 로그인 매칭용
   name         String
   role         String   @default("STAFF") // SUPER | MANAGER | STAFF
   status       String   @default("ACTIVE") // ACTIVE | DISABLED
@@ -392,11 +395,42 @@ model Notification {
   createdAt DateTime @default(now())
 }
 
+// 관리자 패널에서 편집 가능한 전역 설정. key/value 대신 싱글턴 row + 타입드 컬럼으로
+// 모델링(PricingRule/ProjectTypeRule과 달리 다양한 값 종류를 섞어 쓰므로 이 편이 더 명확함).
+// 값이 비어있으면(null/"") 앱 로직(src/lib/settings.ts)이 동일 이름의 환경변수로 폴백한다.
 model Setting {
   id                 String  @id @default("singleton")
+
+  // 사이트 정보
   companyName        String  @default("CodeMaker")
+  contactEmail       String?
+  contactPhone       String?
+  metaDescription    String?
+
+  // 무통장입금 계좌
   bankName           String  @default("카카오뱅크")
   bankAccountNumber  String  @default("3333-00-1234567")
   bankAccountHolder  String  @default("코드메이커(주)")
   noticeMessage      String?
+
+  // 토글
+  allowGuestOrders   Boolean @default(true)
+  autoApproveReviews Boolean @default(false)
+
+  // Discord 웹훅(주문 알림) + 봇
+  discordWebhookUrl      String?
+  discordNotifyEnabled   Boolean @default(true)
+  discordNotifyChannelId String?
+  discordBotToken        String?
+  discordGuildId         String?
+  discordAdminRoleIds    String? // 쉼표(,)로 구분된 역할 ID 목록
+  discordAdminUserIds    String? // 쉼표(,)로 구분된 유저 ID 목록
+
+  // OAuth 앱 자격증명 (DB 값이 있으면 환경변수보다 우선)
+  googleClientId     String?
+  googleClientSecret String?
+  githubClientId     String?
+  githubClientSecret String?
+
+  updatedAt DateTime @default(now()) @updatedAt
 }

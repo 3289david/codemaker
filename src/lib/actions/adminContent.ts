@@ -312,18 +312,59 @@ export async function setMemberStatusAction(formData: FormData): Promise<void> {
 
 // ── 설정 ─────────────────────────────────────────────────────
 
+// 시크릿성 필드(웹훅 URL, OAuth client secret, 봇 토큰)는 관리자 UI에서 마스킹되어 표시된다.
+// 폼에서 빈 값으로 제출되면 "변경하지 않음"으로 간주하고 기존 DB 값을 유지한다 — 재입력해야만 교체된다.
+const SECRET_FIELDS = [
+  "discordWebhookUrl",
+  "discordBotToken",
+  "googleClientSecret",
+  "githubClientSecret",
+] as const;
+
 export async function updateSettingsAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const admin = await requireAdmin();
-  const companyName = String(formData.get("companyName") || "").trim();
-  const bankName = String(formData.get("bankName") || "").trim();
-  const bankAccountNumber = String(formData.get("bankAccountNumber") || "").trim();
-  const bankAccountHolder = String(formData.get("bankAccountHolder") || "").trim();
-  const noticeMessage = String(formData.get("noticeMessage") || "").trim();
+  const existing = await prisma.setting.findUnique({ where: { id: "singleton" } });
+
+  function str(key: string) {
+    return String(formData.get(key) || "").trim();
+  }
+  function secret(key: (typeof SECRET_FIELDS)[number]) {
+    const v = str(key);
+    return v ? v : existing?.[key] ?? null;
+  }
+
+  const data = {
+    companyName: str("companyName") || "CodeMaker",
+    contactEmail: str("contactEmail") || null,
+    contactPhone: str("contactPhone") || null,
+    metaDescription: str("metaDescription") || null,
+
+    bankName: str("bankName"),
+    bankAccountNumber: str("bankAccountNumber"),
+    bankAccountHolder: str("bankAccountHolder"),
+    noticeMessage: str("noticeMessage") || null,
+
+    allowGuestOrders: formData.get("allowGuestOrders") === "on",
+    autoApproveReviews: formData.get("autoApproveReviews") === "on",
+
+    discordWebhookUrl: secret("discordWebhookUrl"),
+    discordNotifyEnabled: formData.get("discordNotifyEnabled") === "on",
+    discordNotifyChannelId: str("discordNotifyChannelId") || null,
+    discordBotToken: secret("discordBotToken"),
+    discordGuildId: str("discordGuildId") || null,
+    discordAdminRoleIds: str("discordAdminRoleIds") || null,
+    discordAdminUserIds: str("discordAdminUserIds") || null,
+
+    googleClientId: str("googleClientId") || null,
+    googleClientSecret: secret("googleClientSecret"),
+    githubClientId: str("githubClientId") || null,
+    githubClientSecret: secret("githubClientSecret"),
+  };
 
   await prisma.setting.upsert({
     where: { id: "singleton" },
-    update: { companyName, bankName, bankAccountNumber, bankAccountHolder, noticeMessage },
-    create: { id: "singleton", companyName, bankName, bankAccountNumber, bankAccountHolder, noticeMessage },
+    update: data,
+    create: { id: "singleton", ...data },
   });
 
   await logAdminActivity(admin.id, "SETTINGS_UPDATE");
