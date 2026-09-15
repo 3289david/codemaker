@@ -64,11 +64,12 @@ optional note.
 
 ## Login: customer OAuth + admin (Google-only)
 
-**Customers** can sign in with email/password, **Google**, or **GitHub** (`/login`). OAuth
-users are matched/created by email (`src/lib/oauth.ts`); if an email already has a
-password account, signing in with Google/GitHub links the provider id to that same
-account rather than creating a duplicate. `User.passwordHash` is nullable for OAuth-only
-accounts.
+**Customers** can sign in with email/password, **Google**, **GitHub**, or **Discord**
+(buttons on both `/login` and `/signup`). OAuth users are matched/created by email
+(`src/lib/oauth.ts`); if an email already has a password account, signing in with
+Google/GitHub/Discord links the provider id to that same account rather than creating a
+duplicate. `User.passwordHash` is nullable for OAuth-only accounts. Password login was
+intentionally kept (not replaced) — see final report for why.
 
 **Admins** sign in at `/admin/login` with **Google only** — there is no password/TOTP login
 anymore. The flow: click "Google로 관리자 로그인" → Google OAuth → if the returned email
@@ -130,6 +131,11 @@ admin can rotate secrets/toggle features without a redeploy.
 | `DISCORD_ADMIN_USER_IDS` / `DISCORD_ADMIN_ROLE_IDS` | needed for bot admin commands (DB override) | comma-separated Discord user/role IDs allowed to run `/주문목록`, `/주문`, `/공지` |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | needed for Google login (DB override) | Google Cloud Console > Credentials > OAuth client ID (Web application). Redirect URI: `<NEXT_PUBLIC_APP_ORIGIN>/api/auth/google/callback` |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | needed for GitHub login (DB override) | GitHub > Developer settings > OAuth Apps. Callback URL: `<NEXT_PUBLIC_APP_ORIGIN>/api/auth/github/callback` |
+| `DISCORD_OAUTH_CLIENT_ID` / `DISCORD_OAUTH_CLIENT_SECRET` | needed for Discord login | Same Discord application as the bot (`DISCORD_CLIENT_ID`) — Developer Portal > OAuth2 > General for the secret, OAuth2 > Redirects to register `<NEXT_PUBLIC_APP_ORIGIN>/api/auth/discord/callback`. Env-only (not yet a DB setting). |
+
+Customer login now offers Google, GitHub, and Discord (on both `/login` and `/signup`,
+via the shared `src/components/OAuthButtons.tsx`) alongside the original email/password
+form — OAuth was added, password login was intentionally **not** removed for customers.
 
 See `.env.example` for a fully-annotated copy of all of the above, including step-by-step
 "how to obtain this" notes for each Discord/Google/GitHub credential.
