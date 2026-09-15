@@ -8,12 +8,15 @@ import type { CalcResult } from "@/lib/pricing";
 export function Calculator({
   projectTypes,
   features,
+  addons = [],
 }: {
   projectTypes: { key: string; label: string }[];
   features: { key: string; label: string }[];
+  addons?: { key: string; label: string; price: number }[];
 }) {
   const [projectType, setProjectType] = useState(projectTypes[0]?.key ?? "WEBSITE");
   const [selected, setSelected] = useState<string[]>([]);
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
   const [result, setResult] = useState<CalcResult | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -21,9 +24,13 @@ export function Calculator({
     setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
   }
 
+  function toggleAddon(key: string) {
+    setSelectedAddons((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
+  }
+
   function calculate() {
     startTransition(async () => {
-      const r = await estimateAction(projectType, selected);
+      const r = await estimateAction(projectType, [...selected, ...selectedAddons]);
       setResult(r);
     });
   }
@@ -68,6 +75,29 @@ export function Calculator({
             ))}
           </div>
         </div>
+        {addons.length > 0 && (
+          <div>
+            <p className="font-semibold mb-3">부가 옵션 (선택, 20만원 상한과 별도 추가)</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {addons.map((a) => (
+                <label
+                  key={a.key}
+                  className={`flex items-center gap-2 text-sm px-3 py-2 rounded-lg border cursor-pointer ${
+                    selectedAddons.includes(a.key) ? "bg-emerald-50 border-emerald-400" : "border-neutral-300"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedAddons.includes(a.key)}
+                    onChange={() => toggleAddon(a.key)}
+                    className="accent-emerald-600"
+                  />
+                  {a.label} (+{a.price.toLocaleString()}원)
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
         <button
           onClick={calculate}
           disabled={isPending}
@@ -78,13 +108,21 @@ export function Calculator({
       </div>
 
       <div className="bg-neutral-50 border border-neutral-200 rounded-xl p-6 h-fit sticky top-24">
-        <p className="text-sm text-neutral-400 mb-1">예상 금액</p>
+        <p className="text-sm text-neutral-400 mb-1">개발 비용 (최대 200,000원)</p>
         {result ? (
           <>
             <p className="text-2xl font-bold text-indigo-600">
               {result.priceMin.toLocaleString()}원 ~ {result.priceMax.toLocaleString()}원
             </p>
+            {result.hostingPrice > 0 && (
+              <p className="text-sm text-emerald-600 mt-1">+ 호스팅 {result.hostingPrice.toLocaleString()}원 (상한 별도)</p>
+            )}
             <p className="text-sm text-neutral-500 mt-1">예상 기간: 약 {result.days}일</p>
+            {result.hostingPrice > 0 && (
+              <p className="text-base font-semibold mt-2 pt-2 border-t border-neutral-200">
+                총 예상 금액: {(result.priceMin + result.hostingPrice).toLocaleString()}원 ~ {result.totalMax.toLocaleString()}원
+              </p>
+            )}
             <div className="mt-4 space-y-1 text-xs text-neutral-500">
               {result.breakdown.map((b, i) => (
                 <div key={i} className="flex justify-between">
@@ -94,7 +132,7 @@ export function Calculator({
               ))}
             </div>
             <Link
-              href={`/order/new?type=${projectType}&features=${selected.join(",")}`}
+              href={`/order/new?type=${projectType}&features=${[...selected, ...selectedAddons].join(",")}`}
               className="mt-6 block text-center bg-indigo-600 text-white font-medium px-4 py-3 rounded-lg hover:bg-indigo-700"
             >
               정식 견적 요청

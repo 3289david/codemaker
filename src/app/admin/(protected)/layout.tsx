@@ -14,6 +14,7 @@ const NAV: { href: string; label: string }[] = [
   { href: "/admin/notices", label: "공지사항" },
   { href: "/admin/faq", label: "FAQ" },
   { href: "/admin/inquiries", label: "문의 관리" },
+  { href: "/admin/chat", label: "1:1 상담 채팅" },
   { href: "/admin/settings", label: "설정" },
   { href: "/admin/security/admins", label: "관리자 보안" },
 ];
@@ -21,14 +22,16 @@ const NAV: { href: string; label: string }[] = [
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const admin = await requireAdmin();
 
-  const [waitingInquiries, notifiedPayments] = await Promise.all([
+  const [waitingInquiries, notifiedPayments, unreadChats] = await Promise.all([
     prisma.inquiry.count({ where: { status: INQUIRY_STATUS.WAITING } }),
     prisma.payment.count({ where: { status: PAYMENT_STATUS.NOTIFIED } }),
+    prisma.supportThread.count({ where: { unreadByAdmin: true } }),
   ]);
 
   const badges: Record<string, number> = {
     "/admin/inquiries": waitingInquiries,
     "/admin/orders": notifiedPayments,
+    "/admin/chat": unreadChats,
   };
 
   return (

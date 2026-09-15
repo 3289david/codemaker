@@ -49,7 +49,7 @@ async function main() {
       summary: "회사/브랜드 소개 웹사이트부터 반응형 랜딩페이지까지",
       description: "기획-디자인-퍼블리싱-배포까지 한 번에 진행하는 웹사이트 제작 서비스입니다. Next.js 기반으로 빠르고 SEO에 유리한 사이트를 만들어 드립니다.",
       capabilities: ["반응형 디자인", "SEO 최적화", "관리자 페이지 연동", "도메인/호스팅 설정"],
-      priceMin: 800000, priceMax: 4000000, durationMin: 5, durationMax: 21,
+      priceMin: 60000, priceMax: 150000, durationMin: 5, durationMax: 21,
     },
     {
       slug: "webapp-service",
@@ -59,7 +59,7 @@ async function main() {
       summary: "회원, 결제, 게시판 등 복잡한 로직을 포함한 웹서비스 개발",
       description: "SaaS, 커뮤니티, 예약 시스템 등 로그인/DB/결제가 포함된 본격적인 웹서비스를 처음부터 끝까지 개발합니다.",
       capabilities: ["회원 시스템", "DB 설계", "결제 연동", "실시간 기능", "관리자 대시보드"],
-      priceMin: 2000000, priceMax: 15000000, durationMin: 14, durationMax: 60,
+      priceMin: 100000, priceMax: 200000, durationMin: 14, durationMax: 60,
     },
     {
       slug: "discord-bot",
@@ -69,7 +69,7 @@ async function main() {
       summary: "서버 관리, 게임, 알림, 티켓 등 다양한 디스코드 봇 개발",
       description: "슬래시 커맨드 기반의 안정적인 디스코드 봇을 제작합니다. 24시간 호스팅 및 배포까지 지원 가능합니다.",
       capabilities: ["슬래시 커맨드", "티켓 시스템", "레벨/포인트 시스템", "관리자 명령어", "웹훅 연동"],
-      priceMin: 300000, priceMax: 3000000, durationMin: 3, durationMax: 21,
+      priceMin: 40000, priceMax: 120000, durationMin: 3, durationMax: 21,
     },
     {
       slug: "chrome-extension",
@@ -79,7 +79,7 @@ async function main() {
       summary: "생산성, 자동화, 마케팅용 크롬 확장 프로그램 개발",
       description: "매니페스트 V3 기반의 크롬 확장 프로그램을 제작하고 스토어 등록까지 지원합니다.",
       capabilities: ["콘텐츠 스크립트", "백그라운드 워커", "옵션 페이지", "스토어 등록 지원"],
-      priceMin: 400000, priceMax: 2500000, durationMin: 5, durationMax: 21,
+      priceMin: 40000, priceMax: 120000, durationMin: 5, durationMax: 21,
     },
     {
       slug: "api-development",
@@ -89,7 +89,7 @@ async function main() {
       summary: "REST/GraphQL API 서버 설계 및 개발",
       description: "프론트엔드/모바일 앱과 연동 가능한 안정적인 API 서버를 설계하고 개발합니다. 문서화까지 포함합니다.",
       capabilities: ["REST API", "인증/인가", "API 문서화", "Rate Limiting"],
-      priceMin: 500000, priceMax: 5000000, durationMin: 5, durationMax: 30,
+      priceMin: 50000, priceMax: 150000, durationMin: 5, durationMax: 30,
     },
     {
       slug: "automation-program",
@@ -99,7 +99,7 @@ async function main() {
       summary: "반복 업무를 대신하는 스크립트/데스크톱 자동화 프로그램",
       description: "엑셀 자동화, 웹 크롤링, 스케줄링 작업 등 반복적인 수작업을 자동화하는 프로그램을 개발합니다.",
       capabilities: ["웹 크롤링", "엑셀 자동화", "스케줄링", "알림 연동"],
-      priceMin: 300000, priceMax: 3000000, durationMin: 3, durationMax: 21,
+      priceMin: 40000, priceMax: 120000, durationMin: 3, durationMax: 21,
     },
     {
       slug: "ai-feature",
@@ -109,7 +109,7 @@ async function main() {
       summary: "챗봇, 요약, 추천 등 AI 기능을 서비스에 통합",
       description: "LLM API를 활용한 챗봇, 문서 요약, 추천 시스템 등 AI 기능을 기존 서비스나 신규 서비스에 통합합니다.",
       capabilities: ["LLM API 연동", "RAG 파이프라인", "프롬프트 엔지니어링", "임베딩/벡터 검색"],
-      priceMin: 700000, priceMax: 8000000, durationMin: 7, durationMax: 30,
+      priceMin: 60000, priceMax: 180000, durationMin: 7, durationMax: 30,
     },
     {
       slug: "db-integration",
@@ -119,7 +119,7 @@ async function main() {
       summary: "기존 서비스에 데이터베이스 설계 및 연동 작업",
       description: "신규 DB 스키마 설계부터 기존 서비스의 DB 마이그레이션, 성능 튜닝까지 지원합니다.",
       capabilities: ["스키마 설계", "마이그레이션", "쿼리 최적화", "백업 전략 수립"],
-      priceMin: 300000, priceMax: 2500000, durationMin: 3, durationMax: 14,
+      priceMin: 30000, priceMax: 100000, durationMin: 3, durationMax: 14,
     },
     {
       slug: "admin-page",
@@ -129,7 +129,7 @@ async function main() {
       summary: "운영에 필요한 백오피스/관리자 대시보드 개발",
       description: "통계, 회원 관리, 콘텐츠 관리 등 서비스 운영에 필요한 관리자 페이지를 제작합니다.",
       capabilities: ["통계 대시보드", "권한 관리", "CRUD 관리 화면", "감사 로그"],
-      priceMin: 500000, priceMax: 4000000, durationMin: 5, durationMax: 21,
+      priceMin: 60000, priceMax: 180000, durationMin: 5, durationMax: 21,
     },
     {
       slug: "maintenance",
@@ -139,7 +139,7 @@ async function main() {
       summary: "이미 만들어진 서비스의 유지보수, 버그 수정, 기능 추가",
       description: "타사에서 만든 코드를 포함하여 기존 코드베이스를 분석하고 버그 수정, 기능 추가, 리팩토링을 진행합니다.",
       capabilities: ["코드베이스 분석", "버그 수정", "신규 기능 추가", "성능 개선"],
-      priceMin: 150000, priceMax: 3000000, durationMin: 1, durationMax: 21,
+      priceMin: 20000, priceMax: 150000, durationMin: 1, durationMax: 21,
     },
     {
       slug: "ecommerce",
@@ -149,7 +149,7 @@ async function main() {
       summary: "상품/주문/결제/배송 관리까지 포함한 이커머스 사이트 구축",
       description: "상품 등록, 장바구니, 결제, 주문/배송 관리, 쿠폰/할인 등 쇼핑몰 운영에 필요한 기능을 처음부터 구축합니다.",
       capabilities: ["상품/재고 관리", "장바구니/결제", "주문·배송 관리", "쿠폰/할인 시스템"],
-      priceMin: 2500000, priceMax: 18000000, durationMin: 21, durationMax: 70,
+      priceMin: 120000, priceMax: 200000, durationMin: 21, durationMax: 70,
     },
     {
       slug: "landing-page",
@@ -159,7 +159,7 @@ async function main() {
       summary: "제품/서비스 출시, 광고 캠페인용 단일 페이지 제작",
       description: "전환율에 최적화된 단일 페이지 랜딩페이지를 빠르게 제작합니다. 광고 유입 트래킹, 폼 연동까지 지원합니다.",
       capabilities: ["반응형 디자인", "폼/DB 연동", "광고 트래킹 스크립트", "빠른 납기"],
-      priceMin: 300000, priceMax: 1500000, durationMin: 3, durationMax: 10,
+      priceMin: 30000, priceMax: 80000, durationMin: 3, durationMax: 10,
     },
     {
       slug: "telegram-bot",
@@ -169,7 +169,7 @@ async function main() {
       summary: "알림, 자동응답, 주문 접수 등 텔레그램 봇 개발",
       description: "텔레그램 API 기반의 알림/자동응답/커머스 봇을 제작합니다. 웹훅 연동 및 관리자 명령어를 포함합니다.",
       capabilities: ["명령어 기반 인터페이스", "웹훅 연동", "관리자 알림", "다국어 지원"],
-      priceMin: 300000, priceMax: 3000000, durationMin: 3, durationMax: 21,
+      priceMin: 40000, priceMax: 120000, durationMin: 3, durationMax: 21,
     },
     {
       slug: "web-scraping",
@@ -179,7 +179,7 @@ async function main() {
       summary: "웹사이트 데이터 수집 및 정기 자동화 파이프라인 구축",
       description: "여러 웹사이트에서 데이터를 수집/정제하고, 스케줄링을 통해 정기적으로 자동 실행되는 크롤링 파이프라인을 구축합니다.",
       capabilities: ["동적 페이지 크롤링", "데이터 정제/저장", "스케줄링", "차단 우회/재시도 로직"],
-      priceMin: 300000, priceMax: 3500000, durationMin: 3, durationMax: 21,
+      priceMin: 40000, priceMax: 130000, durationMin: 3, durationMax: 21,
     },
     {
       slug: "payment-integration",
@@ -189,7 +189,7 @@ async function main() {
       summary: "PG사/간편결제 연동으로 온라인 결제 기능 추가",
       description: "카드/간편결제 PG 연동, 정기결제, 환불/취소 처리 등 결제 관련 기능을 기존/신규 서비스에 통합합니다.",
       capabilities: ["PG사 연동", "정기결제(구독)", "환불/취소 처리", "결제 로그/정산"],
-      priceMin: 500000, priceMax: 6000000, durationMin: 5, durationMax: 30,
+      priceMin: 60000, priceMax: 180000, durationMin: 5, durationMax: 30,
     },
     {
       slug: "mobile-app",
@@ -199,7 +199,7 @@ async function main() {
       summary: "iOS/Android 동시 대응 크로스플랫폼 앱 개발",
       description: "React Native 기반으로 iOS/Android를 동시에 대응하는 앱을 개발합니다. 일정에 따라 대응 가능 여부를 사전에 협의합니다.",
       capabilities: ["크로스플랫폼(iOS/Android)", "푸시 알림", "앱스토어 배포 지원", "네이티브 기능 연동"],
-      priceMin: 3000000, priceMax: 20000000, durationMin: 21, durationMax: 90,
+      priceMin: 150000, priceMax: 200000, durationMin: 21, durationMax: 90,
     },
     {
       slug: "refactoring",
@@ -209,7 +209,7 @@ async function main() {
       summary: "레거시 코드 구조 개선 및 기술 부채 정리",
       description: "가독성/유지보수성을 낮추는 레거시 코드를 점진적으로 리팩토링합니다. 테스트 없이도 안전하게 진행할 수 있도록 단계별로 접근합니다.",
       capabilities: ["코드 구조 개선", "중복 제거", "네이밍/구조 정리", "점진적 마이그레이션"],
-      priceMin: 300000, priceMax: 4000000, durationMin: 3, durationMax: 30,
+      priceMin: 30000, priceMax: 120000, durationMin: 3, durationMax: 30,
     },
     {
       slug: "performance-optimization",
@@ -219,7 +219,7 @@ async function main() {
       summary: "로딩 속도, 쿼리 성능, 서버 자원 사용 최적화",
       description: "프론트엔드 번들/렌더링 최적화, DB 쿼리 튜닝, 서버 자원 사용량 개선 등 성능 이슈를 진단하고 해결합니다.",
       capabilities: ["프론트엔드 성능 진단", "쿼리 튜닝", "캐싱 전략", "서버 리소스 최적화"],
-      priceMin: 300000, priceMax: 3500000, durationMin: 3, durationMax: 21,
+      priceMin: 30000, priceMax: 120000, durationMin: 3, durationMax: 21,
     },
     {
       slug: "deploy-server-setup",
@@ -229,7 +229,7 @@ async function main() {
       summary: "VPS/클라우드 서버 구축, CI/CD, 배포 자동화",
       description: "서버 초기 세팅, Nginx/SSL, CI/CD 파이프라인 구성 등 안정적인 배포 환경을 구축합니다.",
       capabilities: ["서버 초기 세팅", "Nginx/SSL", "CI/CD 구성", "모니터링/로그 설정"],
-      priceMin: 200000, priceMax: 2000000, durationMin: 1, durationMax: 10,
+      priceMin: 20000, priceMax: 80000, durationMin: 1, durationMax: 10,
     },
     {
       slug: "domain-hosting-setup",
@@ -239,7 +239,7 @@ async function main() {
       summary: "도메인 구매 안내부터 DNS/호스팅 연결까지 지원",
       description: "도메인 연결, DNS 설정, 호스팅사 이전, SSL 인증서 발급 등 사이트 오픈에 필요한 인프라 설정을 지원합니다.",
       capabilities: ["DNS 설정", "SSL 인증서 발급", "호스팅 이전", "이메일(MX) 설정"],
-      priceMin: 100000, priceMax: 800000, durationMin: 1, durationMax: 5,
+      priceMin: 15000, priceMax: 50000, durationMin: 1, durationMax: 5,
     },
     {
       slug: "maintenance-contract",
@@ -249,7 +249,7 @@ async function main() {
       summary: "월 단위 정기 유지보수/기능 개선 계약",
       description: "월 단위로 버그 대응, 소규모 기능 추가, 서버 모니터링을 포함한 정기 유지보수 계약을 제공합니다.",
       capabilities: ["월 단위 버그 대응", "소규모 기능 개선", "서버/장애 모니터링", "우선 대응 SLA"],
-      priceMin: 200000, priceMax: 2000000, durationMin: 30, durationMax: 30,
+      priceMin: 30000, priceMax: 100000, durationMin: 30, durationMax: 30,
     },
     {
       slug: "security-audit",
@@ -259,7 +259,7 @@ async function main() {
       summary: "웹 서비스 취약점 점검 및 보안 강화",
       description: "인증/인가, 입력값 검증, 주요 취약점(OWASP Top 10 등)을 점검하고 개선 방안을 적용합니다.",
       capabilities: ["취약점 점검", "인증/인가 강화", "입력값 검증", "레이트 리미팅/로그"],
-      priceMin: 300000, priceMax: 3000000, durationMin: 3, durationMax: 14,
+      priceMin: 30000, priceMax: 120000, durationMin: 3, durationMax: 14,
     },
     {
       slug: "custom-development",
@@ -269,7 +269,7 @@ async function main() {
       summary: "위 카테고리에 없는 특수 요구사항 맞춤 개발",
       description: "위 서비스 분류에 딱 맞지 않는 특수한 요구사항도 상담을 통해 범위와 견적을 협의하여 진행합니다.",
       capabilities: ["요구사항 분석/컨설팅", "기술 스택 자유 선택", "맞춤 견적 산정"],
-      priceMin: 200000, priceMax: 20000000, durationMin: 1, durationMax: 90,
+      priceMin: 30000, priceMax: 200000, durationMin: 1, durationMax: 90,
     },
   ];
 
@@ -297,12 +297,12 @@ async function main() {
 
   // ── 견적 계산기 기본값 (제작 종류) ───────────────────────────
   const PROJECT_TYPE_RULES = [
-    { key: "WEBSITE", label: "웹사이트", basePrice: 800000, baseDays: 7 },
-    { key: "WEBAPP", label: "웹서비스", basePrice: 2000000, baseDays: 14 },
-    { key: "PROGRAM", label: "프로그램/자동화", basePrice: 500000, baseDays: 5 },
-    { key: "BOT", label: "봇(디스코드 등)", basePrice: 400000, baseDays: 4 },
-    { key: "API", label: "API", basePrice: 600000, baseDays: 5 },
-    { key: "ETC", label: "기타", basePrice: 500000, baseDays: 5 },
+    { key: "WEBSITE", label: "웹사이트", basePrice: 50000, baseDays: 3 },
+    { key: "WEBAPP", label: "웹서비스", basePrice: 80000, baseDays: 5 },
+    { key: "PROGRAM", label: "프로그램/자동화", basePrice: 40000, baseDays: 2 },
+    { key: "BOT", label: "봇(디스코드 등)", basePrice: 30000, baseDays: 2 },
+    { key: "API", label: "API", basePrice: 40000, baseDays: 2 },
+    { key: "ETC", label: "기타", basePrice: 40000, baseDays: 2 },
   ];
   for (let i = 0; i < PROJECT_TYPE_RULES.length; i++) {
     const r = PROJECT_TYPE_RULES[i];
@@ -315,26 +315,28 @@ async function main() {
 
   // ── 견적 계산기 기능별 가중치 ────────────────────────────────
   const FEATURE_RULES = [
-    { key: "LOGIN", label: "로그인", price: 150000, days: 2 },
-    { key: "SIGNUP", label: "회원가입", price: 100000, days: 1 },
-    { key: "DB", label: "DB 연동", price: 200000, days: 2 },
-    { key: "ADMIN", label: "관리자 페이지", price: 400000, days: 4 },
-    { key: "PAYMENT", label: "결제", price: 500000, days: 4 },
-    { key: "API", label: "외부 API 연동", price: 300000, days: 3 },
-    { key: "AI", label: "AI 기능", price: 700000, days: 5 },
-    { key: "UPLOAD", label: "파일 업로드", price: 150000, days: 1 },
-    { key: "EMAIL", label: "이메일 발송", price: 100000, days: 1 },
-    { key: "DISCORD", label: "Discord 연동", price: 250000, days: 2 },
-    { key: "OAUTH", label: "소셜 로그인(OAuth)", price: 250000, days: 2 },
-    { key: "SEARCH", label: "검색", price: 200000, days: 2 },
-    { key: "BOARD", label: "게시판", price: 300000, days: 3 },
+    { key: "LOGIN", label: "로그인", price: 15000, days: 1, category: "FEATURE" },
+    { key: "SIGNUP", label: "회원가입", price: 10000, days: 1, category: "FEATURE" },
+    { key: "DB", label: "DB 연동", price: 20000, days: 1, category: "FEATURE" },
+    { key: "ADMIN", label: "관리자 페이지", price: 30000, days: 2, category: "FEATURE" },
+    { key: "PAYMENT", label: "결제", price: 30000, days: 2, category: "FEATURE" },
+    { key: "API", label: "외부 API 연동", price: 20000, days: 1, category: "FEATURE" },
+    { key: "AI", label: "AI 기능", price: 40000, days: 2, category: "FEATURE" },
+    { key: "UPLOAD", label: "파일 업로드", price: 10000, days: 1, category: "FEATURE" },
+    { key: "EMAIL", label: "이메일 발송", price: 10000, days: 1, category: "FEATURE" },
+    { key: "DISCORD", label: "Discord 연동", price: 15000, days: 1, category: "FEATURE" },
+    { key: "OAUTH", label: "소셜 로그인(OAuth)", price: 15000, days: 1, category: "FEATURE" },
+    { key: "SEARCH", label: "검색", price: 15000, days: 1, category: "FEATURE" },
+    { key: "BOARD", label: "게시판", price: 20000, days: 1, category: "FEATURE" },
+    // 호스팅은 개발 비용 20만원 상한과 별개로 추가되는 부가 옵션 (ADDON)
+    { key: "HOSTING", label: "호스팅 연동", price: 30000, days: 1, category: "ADDON" },
   ];
   for (let i = 0; i < FEATURE_RULES.length; i++) {
     const r = FEATURE_RULES[i];
     await prisma.pricingRule.upsert({
       where: { key: r.key },
       update: {},
-      create: { ...r, sortOrder: i },
+      create: { key: r.key, label: r.label, price: r.price, days: r.days, category: r.category, sortOrder: i },
     });
   }
 

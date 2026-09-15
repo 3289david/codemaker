@@ -17,30 +17,32 @@ datasource db {
 // ─────────────────────────────────────────────────────────────
 
 model User {
-  id               String    @id @default(cuid())
-  email            String    @unique
+  id               String   @id @default(cuid())
+  email            String   @unique
   passwordHash     String?
   nickname         String
   phone            String?
   discordId        String? // 수기 입력용(주문 연락처 등) — OAuth 식별자와 다른 용도, 혼동 방지를 위해 분리
-  discordOAuthId   String?   @unique
-  googleId         String?   @unique
-  githubId         String?   @unique
+  discordOAuthId   String?  @unique
+  googleId         String?  @unique
+  githubId         String?  @unique
   profileImage     String?
-  status           String    @default("ACTIVE") // ACTIVE | SUSPENDED | WITHDRAWN
+  status           String   @default("ACTIVE") // ACTIVE | SUSPENDED | WITHDRAWN
   suspendedReason  String?
-  emailVerified    Boolean   @default(false)
+  emailVerified    Boolean  @default(false)
   emailVerifyToken String?
-  isSeedData       Boolean   @default(false)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  isSeedData       Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-  orders        Order[]
-  reviews       Review[]
-  inquiries     Inquiry[]
-  notifications Notification[]
-  sessions      UserSession[]
-  messages      Message[]
+  orders          Order[]
+  reviews         Review[]
+  inquiries       Inquiry[]
+  notifications   Notification[]
+  sessions        UserSession[]
+  messages        Message[]
+  supportThreads  SupportThread[]
+  supportMessages SupportMessage[]
 }
 
 model UserSession {
@@ -71,11 +73,12 @@ model AdminUser {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  loginLogs      AdminLoginLog[]
-  activityLogs   AdminActivityLog[]
-  sessions       AdminSession[]
-  assignedOrders Order[]           @relation("AssignedAdmin")
-  messages       Message[]
+  loginLogs       AdminLoginLog[]
+  activityLogs    AdminActivityLog[]
+  sessions        AdminSession[]
+  assignedOrders  Order[]            @relation("AssignedAdmin")
+  messages        Message[]
+  supportMessages SupportMessage[]
 }
 
 model AdminSession {
@@ -158,13 +161,13 @@ model PricingRule {
 
 // 제작 종류별 기본 금액/기간 (BASE 가중치)
 model ProjectTypeRule {
-  id        String   @id @default(cuid())
-  key       String   @unique // WEBSITE | WEBAPP | PROGRAM | BOT | API | ETC
+  id        String  @id @default(cuid())
+  key       String  @unique // WEBSITE | WEBAPP | PROGRAM | BOT | API | ETC
   label     String
   basePrice Int
   baseDays  Int
-  active    Boolean  @default(true)
-  sortOrder Int      @default(0)
+  active    Boolean @default(true)
+  sortOrder Int     @default(0)
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -190,19 +193,19 @@ model Portfolio {
 }
 
 model Review {
-  id         String   @id @default(cuid())
+  id         String    @id @default(cuid())
   userId     String
-  user       User     @relation(fields: [userId], references: [id])
-  orderId    String?  @unique
-  order      Order?   @relation(fields: [orderId], references: [id])
+  user       User      @relation(fields: [userId], references: [id])
+  orderId    String?   @unique
+  order      Order?    @relation(fields: [orderId], references: [id])
   rating     Int
   content    String
   images     String? // JSON array
-  status     String   @default("PENDING") // PENDING | APPROVED | HIDDEN
+  status     String    @default("PENDING") // PENDING | APPROVED | HIDDEN
   adminReply String?
   repliedAt  DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Notice {
@@ -246,53 +249,53 @@ model Inquiry {
 // ─────────────────────────────────────────────────────────────
 
 model Order {
-  id               String    @id @default(cuid())
-  orderNo          String    @unique // e.g. A-10291
-  userId           String?
-  user             User?     @relation(fields: [userId], references: [id])
+  id      String  @id @default(cuid())
+  orderNo String  @unique // e.g. A-10291
+  userId  String?
+  user    User?   @relation(fields: [userId], references: [id])
 
   // 비회원 주문 지원용 연락처 + PIN(공개 조회용, 해시 저장)
-  guestName        String?
-  guestEmail       String?
-  guestPhone       String?
-  guestDiscord     String?
-  pinHash          String
+  guestName    String?
+  guestEmail   String?
+  guestPhone   String?
+  guestDiscord String?
+  pinHash      String
 
-  title            String
-  projectType      String // WEBSITE | WEBAPP | PROGRAM | BOT | API | ETC
-  description      String
-  features         String // JSON array of PricingRule keys
-  referenceUrls    String? // JSON array
-  referenceImages  String? // JSON array of upload keys
-  attachments      String? // JSON array of upload keys
-  desiredTimeline  String?
-  budget           String?
-  contactEmail     String
-  contactPhone     String?
-  contactDiscord   String?
+  title           String
+  projectType     String // WEBSITE | WEBAPP | PROGRAM | BOT | API | ETC
+  description     String
+  features        String // JSON array of PricingRule keys
+  referenceUrls   String? // JSON array
+  referenceImages String? // JSON array of upload keys
+  attachments     String? // JSON array of upload keys
+  desiredTimeline String?
+  budget          String?
+  contactEmail    String
+  contactPhone    String?
+  contactDiscord  String?
 
   estimatedPriceMin Int?
   estimatedPriceMax Int?
   estimatedDays     Int?
 
-  status           String    @default("접수") // 접수 | 견적확인 | 결제대기 | 제작중 | 검수중 | 수정중 | 완료 | 취소
-  progress         Int       @default(0)
-  dueDate          DateTime?
-  assignedAdminId  String?
-  assignedAdmin    AdminUser? @relation("AssignedAdmin", fields: [assignedAdminId], references: [id])
-  internalMemo     String?
+  status          String     @default("접수") // 접수 | 견적확인 | 결제대기 | 제작중 | 검수중 | 수정중 | 완료 | 취소
+  progress        Int        @default(0)
+  dueDate         DateTime?
+  assignedAdminId String?
+  assignedAdmin   AdminUser? @relation("AssignedAdmin", fields: [assignedAdminId], references: [id])
+  internalMemo    String?
 
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  statusHistory     OrderStatusHistory[]
-  quote             Quote?
-  payment           Payment?
-  messages          Message[]
-  revisionRequests  RevisionRequest[]
-  deliverables      Deliverable[]
-  review            Review?
-  notifications     Notification[]
+  statusHistory    OrderStatusHistory[]
+  quote            Quote?
+  payment          Payment?
+  messages         Message[]
+  revisionRequests RevisionRequest[]
+  deliverables     Deliverable[]
+  review           Review?
+  notifications    Notification[]
 }
 
 model OrderStatusHistory {
@@ -321,18 +324,18 @@ model Quote {
 }
 
 model Payment {
-  id             String    @id @default(cuid())
-  orderId        String    @unique
-  order          Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  amount         Int
-  method         String    @default("BANK_TRANSFER")
-  status         String    @default("PENDING") // PENDING | NOTIFIED | CONFIRMED
-  depositorName  String?
-  notifiedAt     DateTime?
-  confirmedAt    DateTime?
-  confirmedBy    String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id            String    @id @default(cuid())
+  orderId       String    @unique
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  amount        Int
+  method        String    @default("BANK_TRANSFER")
+  status        String    @default("PENDING") // PENDING | NOTIFIED | CONFIRMED
+  depositorName String?
+  notifiedAt    DateTime?
+  confirmedAt   DateTime?
+  confirmedBy   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Message {
@@ -350,6 +353,37 @@ model Message {
   readByUser  Boolean    @default(false)
   readByAdmin Boolean    @default(false)
   createdAt   DateTime   @default(now())
+}
+
+// 주문과 무관한 일반 1:1 상담 채팅 (사전 문의 등). 회원은 userId로, 비회원은
+// guestToken(쿠키에 저장된 랜덤 토큰)으로 스레드를 식별한다.
+model SupportThread {
+  id            String   @id @default(cuid())
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id])
+  guestToken    String?  @unique
+  guestLabel    String?
+  status        String   @default("OPEN") // OPEN | CLOSED
+  unreadByAdmin Boolean  @default(true)
+  unreadByUser  Boolean  @default(false)
+  lastMessageAt DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  messages SupportMessage[]
+}
+
+model SupportMessage {
+  id          String        @id @default(cuid())
+  threadId    String
+  thread      SupportThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderType  String // USER | ADMIN
+  userId      String?
+  user        User?         @relation(fields: [userId], references: [id])
+  adminId     String?
+  admin       AdminUser?    @relation(fields: [adminId], references: [id])
+  content     String
+  attachments String? // JSON array of upload keys
+  createdAt   DateTime      @default(now())
 }
 
 model RevisionRequest {
@@ -400,19 +434,19 @@ model Notification {
 // 모델링(PricingRule/ProjectTypeRule과 달리 다양한 값 종류를 섞어 쓰므로 이 편이 더 명확함).
 // 값이 비어있으면(null/"") 앱 로직(src/lib/settings.ts)이 동일 이름의 환경변수로 폴백한다.
 model Setting {
-  id                 String  @id @default("singleton")
+  id String @id @default("singleton")
 
   // 사이트 정보
-  companyName        String  @default("CodeMaker")
-  contactEmail       String?
-  contactPhone       String?
-  metaDescription    String?
+  companyName     String  @default("CodeMaker")
+  contactEmail    String?
+  contactPhone    String?
+  metaDescription String?
 
   // 무통장입금 계좌
-  bankName           String  @default("카카오뱅크")
-  bankAccountNumber  String  @default("3333-00-1234567")
-  bankAccountHolder  String  @default("코드메이커(주)")
-  noticeMessage      String?
+  bankName          String  @default("카카오뱅크")
+  bankAccountNumber String  @default("3333-00-1234567")
+  bankAccountHolder String  @default("코드메이커(주)")
+  noticeMessage     String?
 
   // 토글
   allowGuestOrders   Boolean @default(true)
@@ -428,10 +462,10 @@ model Setting {
   discordAdminUserIds    String? // 쉼표(,)로 구분된 유저 ID 목록
 
   // OAuth 앱 자격증명 (DB 값이 있으면 환경변수보다 우선)
-  googleClientId     String?
-  googleClientSecret String?
-  githubClientId     String?
-  githubClientSecret String?
+  googleClientId           String?
+  googleClientSecret       String?
+  githubClientId           String?
+  githubClientSecret       String?
   discordOAuthClientId     String?
   discordOAuthClientSecret String?
 

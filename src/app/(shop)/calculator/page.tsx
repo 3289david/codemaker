@@ -15,17 +15,20 @@ export default async function CalculatorPage() {
     ? typeRules.map((t) => ({ key: t.key, label: t.label }))
     : PROJECT_TYPES;
   const features = featureRules.length
-    ? featureRules.map((f) => ({ key: f.key, label: f.label }))
+    ? featureRules.filter((f) => f.category !== "ADDON").map((f) => ({ key: f.key, label: f.label }))
     : FEATURE_KEYS;
+  const addons = featureRules
+    .filter((f) => f.category === "ADDON")
+    .map((f) => ({ key: f.key, label: f.label, price: f.price }));
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-16">
       <SectionTitle
         eyebrow="CALCULATOR"
         title="견적 계산기"
-        desc="제작 종류와 필요한 기능을 선택하면 예상 금액과 기간을 바로 확인할 수 있습니다."
+        desc="제작 종류와 필요한 기능을 선택하면 예상 금액과 기간을 바로 확인할 수 있습니다. 개발 비용은 최대 200,000원입니다."
       />
-      <Calculator projectTypes={projectTypes} features={features} />
+      <Calculator projectTypes={projectTypes} features={features} addons={addons} />
     </div>
   );
 }
