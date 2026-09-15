@@ -1,31 +1,22 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { createOrderAction, type OrderFormState } from "@/lib/actions/orders";
 import { SubmitButton } from "@/components/SubmitButton";
 import { FormMessage } from "@/components/ui";
 
 export function OrderForm({
   projectTypes,
-  features,
   defaultType,
-  defaultFeatures,
   isLoggedIn,
   defaultEmail,
 }: {
   projectTypes: { key: string; label: string }[];
-  features: { key: string; label: string }[];
   defaultType?: string;
-  defaultFeatures: string[];
   isLoggedIn: boolean;
   defaultEmail?: string;
 }) {
   const [state, formAction] = useActionState<OrderFormState, FormData>(createOrderAction, undefined);
-  const [selected, setSelected] = useState<string[]>(defaultFeatures);
-
-  function toggle(key: string) {
-    setSelected((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
-  }
 
   return (
     <form action={formAction} className="space-y-6" encType="multipart/form-data">
@@ -41,18 +32,6 @@ export function OrderForm({
             <label key={t.key} className="flex items-center gap-2 text-sm border border-neutral-300 rounded-md px-3 py-2 cursor-pointer has-[:checked]:border-indigo-500 has-[:checked]:bg-indigo-50">
               <input type="radio" name="projectType" value={t.key} defaultChecked={defaultType === t.key || (!defaultType && t.key === projectTypes[0]?.key)} required className="accent-indigo-600" />
               {t.label}
-            </label>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <label className="text-sm font-medium">희망 기능</label>
-        <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {features.map((f) => (
-            <label key={f.key} className={`flex items-center gap-2 text-sm border rounded-md px-3 py-2 cursor-pointer ${selected.includes(f.key) ? "border-indigo-500 bg-indigo-50" : "border-neutral-300"}`}>
-              <input type="checkbox" name="features" value={f.key} checked={selected.includes(f.key)} onChange={() => toggle(f.key)} className="accent-indigo-600" />
-              {f.label}
             </label>
           ))}
         </div>

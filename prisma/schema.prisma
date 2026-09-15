@@ -22,7 +22,8 @@ model User {
   passwordHash     String?
   nickname         String
   phone            String?
-  discordId        String?
+  discordId        String? // 수기 입력용(주문 연락처 등) — OAuth 식별자와 다른 용도, 혼동 방지를 위해 분리
+  discordOAuthId   String?   @unique
   googleId         String?   @unique
   githubId         String?   @unique
   profileImage     String?

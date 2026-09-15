@@ -5,6 +5,7 @@ import Link from "next/link";
 import { loginAction, type AuthState } from "@/lib/actions/auth";
 import { SubmitButton } from "@/components/SubmitButton";
 import { FormMessage } from "@/components/ui";
+import { OAuthButtons } from "@/components/OAuthButtons";
 
 const OAUTH_ERROR_MESSAGES: Record<string, string> = {
   oauth_state: "로그인 요청이 만료되었거나 유효하지 않습니다. 다시 시도해주세요.",
@@ -31,20 +32,7 @@ export default function LoginPage({
         </div>
       )}
 
-      <div className="space-y-2 mb-5">
-        <a
-          href="/api/auth/google"
-          className="flex items-center justify-center gap-2 w-full border border-neutral-300 rounded-md py-2.5 text-sm font-medium hover:bg-neutral-50"
-        >
-          <span aria-hidden>🔵</span> Google로 로그인
-        </a>
-        <a
-          href="/api/auth/github"
-          className="flex items-center justify-center gap-2 w-full border border-neutral-300 rounded-md py-2.5 text-sm font-medium hover:bg-neutral-50 bg-neutral-900 text-white border-neutral-900 hover:bg-neutral-800"
-        >
-          <span aria-hidden>⚫</span> GitHub로 로그인
-        </a>
-      </div>
+      <OAuthButtons />
 
       <div className="flex items-center gap-3 mb-5 text-xs text-neutral-400">
         <div className="h-px bg-neutral-200 flex-1" />

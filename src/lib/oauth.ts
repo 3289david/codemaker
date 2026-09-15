@@ -12,6 +12,10 @@ export function githubRedirectUri() {
   return `${getAppOrigin()}/api/auth/github/callback`;
 }
 
+export function discordRedirectUri() {
+  return `${getAppOrigin()}/api/auth/discord/callback`;
+}
+
 // ── Google ───────────────────────────────────────────────────
 
 export async function getGoogleAuthUrl(state: string) {
@@ -105,25 +109,77 @@ export async function exchangeGithubCode(code: string) {
   return { email, id: String(profile.id), name: profile.name || profile.login, picture: profile.avatar_url };
 }
 
+// ── Discord ──────────────────────────────────────────────────
+
+export async function getDiscordAuthUrl(state: string) {
+  const settings = await getSettings();
+  // Discord는 봇과 OAuth 클라이언트가 같은 애플리케이션 ID를 공유한다.
+  const clientId = process.env.DISCORD_OAUTH_CLIENT_ID || process.env.DISCORD_CLIENT_ID || "";
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: discordRedirectUri(),
+    response_type: "code",
+    scope: "identify email",
+    state,
+  });
+  void settings; // 예약: 추후 DB에서 client_id를 override할 경우를 대비
+  return `https://discord.com/api/oauth2/authorize?${params.toString()}`;
+}
+
+export async function exchangeDiscordCode(code: string) {
+  const clientId = process.env.DISCORD_OAUTH_CLIENT_ID || process.env.DISCORD_CLIENT_ID || "";
+  const clientSecret = process.env.DISCORD_OAUTH_CLIENT_SECRET || "";
+
+  const tokenRes = await fetch("https://discord.com/api/oauth2/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      grant_type: "authorization_code",
+      code,
+      redirect_uri: discordRedirectUri(),
+    }),
+  });
+  if (!tokenRes.ok) throw new Error(`discord token exchange failed: ${await tokenRes.text()}`);
+  const tokenData: { access_token?: string } = await tokenRes.json();
+  if (!tokenData.access_token) throw new Error("discord token exchange returned no access_token");
+
+  const userRes = await fetch("https://discord.com/api/users/@me", {
+    headers: { Authorization: `Bearer ${tokenData.access_token}` },
+  });
+  if (!userRes.ok) throw new Error("discord user request failed");
+  const profile: { id: string; email?: string | null; username: string; global_name?: string | null; avatar?: string | null } =
+    await userRes.json();
+
+  const picture = profile.avatar
+    ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png`
+    : undefined;
+
+  return { email: profile.email ?? undefined, id: profile.id, name: profile.global_name || profile.username, picture };
+}
+
 // ── 고객 계정: 이메일 기준 find-or-create, provider id 연결 ────
 
 export async function findOrCreateOAuthUser(params: {
   email: string;
   name?: string;
-  provider: "google" | "github";
+  provider: "google" | "github" | "discord";
   providerId: string;
   picture?: string;
 }) {
   const { provider, providerId, name, picture } = params;
   const email = params.email.toLowerCase();
 
+  const providerField =
+    provider === "google" ? "googleId" : provider === "github" ? "githubId" : "discordOAuthId";
+
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
-    const alreadyLinked = provider === "google" ? existing.googleId : existing.githubId;
-    if (alreadyLinked) return existing;
+    if (existing[providerField]) return existing;
     return prisma.user.update({
       where: { id: existing.id },
-      data: provider === "google" ? { googleId: providerId } : { githubId: providerId },
+      data: { [providerField]: providerId },
     });
   }
 
@@ -133,7 +189,7 @@ export async function findOrCreateOAuthUser(params: {
       nickname: name || email.split("@")[0],
       profileImage: picture || null,
       emailVerified: true,
-      ...(provider === "google" ? { googleId: providerId } : { githubId: providerId }),
+      [providerField]: providerId,
     },
   });
 }

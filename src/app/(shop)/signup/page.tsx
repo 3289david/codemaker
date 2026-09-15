@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signupAction, type AuthState } from "@/lib/actions/auth";
 import { SubmitButton } from "@/components/SubmitButton";
 import { FormMessage } from "@/components/ui";
+import { OAuthButtons } from "@/components/OAuthButtons";
 
 export default function SignupPage() {
   const [state, formAction] = useActionState<AuthState, FormData>(signupAction, undefined);
@@ -12,6 +13,15 @@ export default function SignupPage() {
   return (
     <div className="max-w-sm mx-auto px-4 py-20">
       <h1 className="text-2xl font-bold text-center mb-6">회원가입</h1>
+
+      <OAuthButtons />
+
+      <div className="flex items-center gap-3 mb-5 text-xs text-neutral-400">
+        <div className="h-px bg-neutral-200 flex-1" />
+        또는 이메일로 가입
+        <div className="h-px bg-neutral-200 flex-1" />
+      </div>
+
       <form action={formAction} className="space-y-3">
         <input name="email" type="email" required placeholder="이메일" className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm" />
         <input name="password" type="password" required placeholder="비밀번호 (8자 이상)" className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm" />

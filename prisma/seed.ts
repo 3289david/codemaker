@@ -39,23 +39,6 @@ async function main() {
     await prisma.adminUser.update({ where: { id: existingAdmin.id }, data: { email: adminGoogleEmail } });
   }
 
-  // ── 고객 계정 ───────────────────────────────────────────────
-  const customerEmail = process.env.SEED_CUSTOMER_EMAIL || "customer@example.com";
-  const customerPassword = process.env.SEED_CUSTOMER_PASSWORD || "Customer123!";
-  let customer = await prisma.user.findUnique({ where: { email: customerEmail } });
-  if (!customer) {
-    customer = await prisma.user.create({
-      data: {
-        email: customerEmail,
-        passwordHash: await bcrypt.hash(customerPassword, 12),
-        nickname: "김코드",
-        phone: "010-1234-5678",
-        emailVerified: true,
-        isSeedData: true,
-      },
-    });
-  }
-
   // ── 서비스 ──────────────────────────────────────────────────
   const SERVICES = [
     {
@@ -157,6 +140,136 @@ async function main() {
       description: "타사에서 만든 코드를 포함하여 기존 코드베이스를 분석하고 버그 수정, 기능 추가, 리팩토링을 진행합니다.",
       capabilities: ["코드베이스 분석", "버그 수정", "신규 기능 추가", "성능 개선"],
       priceMin: 150000, priceMax: 3000000, durationMin: 1, durationMax: 21,
+    },
+    {
+      slug: "ecommerce",
+      category: "WEBAPP",
+      name: "쇼핑몰 제작",
+      icon: "🛒",
+      summary: "상품/주문/결제/배송 관리까지 포함한 이커머스 사이트 구축",
+      description: "상품 등록, 장바구니, 결제, 주문/배송 관리, 쿠폰/할인 등 쇼핑몰 운영에 필요한 기능을 처음부터 구축합니다.",
+      capabilities: ["상품/재고 관리", "장바구니/결제", "주문·배송 관리", "쿠폰/할인 시스템"],
+      priceMin: 2500000, priceMax: 18000000, durationMin: 21, durationMax: 70,
+    },
+    {
+      slug: "landing-page",
+      category: "WEBSITE",
+      name: "랜딩페이지 제작",
+      icon: "🚀",
+      summary: "제품/서비스 출시, 광고 캠페인용 단일 페이지 제작",
+      description: "전환율에 최적화된 단일 페이지 랜딩페이지를 빠르게 제작합니다. 광고 유입 트래킹, 폼 연동까지 지원합니다.",
+      capabilities: ["반응형 디자인", "폼/DB 연동", "광고 트래킹 스크립트", "빠른 납기"],
+      priceMin: 300000, priceMax: 1500000, durationMin: 3, durationMax: 10,
+    },
+    {
+      slug: "telegram-bot",
+      category: "DISCORD_BOT",
+      name: "Telegram Bot 제작",
+      icon: "✈️",
+      summary: "알림, 자동응답, 주문 접수 등 텔레그램 봇 개발",
+      description: "텔레그램 API 기반의 알림/자동응답/커머스 봇을 제작합니다. 웹훅 연동 및 관리자 명령어를 포함합니다.",
+      capabilities: ["명령어 기반 인터페이스", "웹훅 연동", "관리자 알림", "다국어 지원"],
+      priceMin: 300000, priceMax: 3000000, durationMin: 3, durationMax: 21,
+    },
+    {
+      slug: "web-scraping",
+      category: "AUTOMATION",
+      name: "크롤링/스크래핑 자동화",
+      icon: "🕷️",
+      summary: "웹사이트 데이터 수집 및 정기 자동화 파이프라인 구축",
+      description: "여러 웹사이트에서 데이터를 수집/정제하고, 스케줄링을 통해 정기적으로 자동 실행되는 크롤링 파이프라인을 구축합니다.",
+      capabilities: ["동적 페이지 크롤링", "데이터 정제/저장", "스케줄링", "차단 우회/재시도 로직"],
+      priceMin: 300000, priceMax: 3500000, durationMin: 3, durationMax: 21,
+    },
+    {
+      slug: "payment-integration",
+      category: "API",
+      name: "결제 시스템 연동",
+      icon: "💳",
+      summary: "PG사/간편결제 연동으로 온라인 결제 기능 추가",
+      description: "카드/간편결제 PG 연동, 정기결제, 환불/취소 처리 등 결제 관련 기능을 기존/신규 서비스에 통합합니다.",
+      capabilities: ["PG사 연동", "정기결제(구독)", "환불/취소 처리", "결제 로그/정산"],
+      priceMin: 500000, priceMax: 6000000, durationMin: 5, durationMax: 30,
+    },
+    {
+      slug: "mobile-app",
+      category: "WEBAPP",
+      name: "모바일 앱 제작 (React Native)",
+      icon: "📱",
+      summary: "iOS/Android 동시 대응 크로스플랫폼 앱 개발",
+      description: "React Native 기반으로 iOS/Android를 동시에 대응하는 앱을 개발합니다. 일정에 따라 대응 가능 여부를 사전에 협의합니다.",
+      capabilities: ["크로스플랫폼(iOS/Android)", "푸시 알림", "앱스토어 배포 지원", "네이티브 기능 연동"],
+      priceMin: 3000000, priceMax: 20000000, durationMin: 21, durationMax: 90,
+    },
+    {
+      slug: "refactoring",
+      category: "MAINTENANCE",
+      name: "리팩토링",
+      icon: "🧹",
+      summary: "레거시 코드 구조 개선 및 기술 부채 정리",
+      description: "가독성/유지보수성을 낮추는 레거시 코드를 점진적으로 리팩토링합니다. 테스트 없이도 안전하게 진행할 수 있도록 단계별로 접근합니다.",
+      capabilities: ["코드 구조 개선", "중복 제거", "네이밍/구조 정리", "점진적 마이그레이션"],
+      priceMin: 300000, priceMax: 4000000, durationMin: 3, durationMax: 30,
+    },
+    {
+      slug: "performance-optimization",
+      category: "MAINTENANCE",
+      name: "성능 최적화",
+      icon: "⚡",
+      summary: "로딩 속도, 쿼리 성능, 서버 자원 사용 최적화",
+      description: "프론트엔드 번들/렌더링 최적화, DB 쿼리 튜닝, 서버 자원 사용량 개선 등 성능 이슈를 진단하고 해결합니다.",
+      capabilities: ["프론트엔드 성능 진단", "쿼리 튜닝", "캐싱 전략", "서버 리소스 최적화"],
+      priceMin: 300000, priceMax: 3500000, durationMin: 3, durationMax: 21,
+    },
+    {
+      slug: "deploy-server-setup",
+      category: "ADMIN_PAGE",
+      name: "배포/서버 세팅",
+      icon: "🖥️",
+      summary: "VPS/클라우드 서버 구축, CI/CD, 배포 자동화",
+      description: "서버 초기 세팅, Nginx/SSL, CI/CD 파이프라인 구성 등 안정적인 배포 환경을 구축합니다.",
+      capabilities: ["서버 초기 세팅", "Nginx/SSL", "CI/CD 구성", "모니터링/로그 설정"],
+      priceMin: 200000, priceMax: 2000000, durationMin: 1, durationMax: 10,
+    },
+    {
+      slug: "domain-hosting-setup",
+      category: "MAINTENANCE",
+      name: "도메인/호스팅 연결",
+      icon: "🌐",
+      summary: "도메인 구매 안내부터 DNS/호스팅 연결까지 지원",
+      description: "도메인 연결, DNS 설정, 호스팅사 이전, SSL 인증서 발급 등 사이트 오픈에 필요한 인프라 설정을 지원합니다.",
+      capabilities: ["DNS 설정", "SSL 인증서 발급", "호스팅 이전", "이메일(MX) 설정"],
+      priceMin: 100000, priceMax: 800000, durationMin: 1, durationMax: 5,
+    },
+    {
+      slug: "maintenance-contract",
+      category: "MAINTENANCE",
+      name: "유지보수 정기계약",
+      icon: "🔧",
+      summary: "월 단위 정기 유지보수/기능 개선 계약",
+      description: "월 단위로 버그 대응, 소규모 기능 추가, 서버 모니터링을 포함한 정기 유지보수 계약을 제공합니다.",
+      capabilities: ["월 단위 버그 대응", "소규모 기능 개선", "서버/장애 모니터링", "우선 대응 SLA"],
+      priceMin: 200000, priceMax: 2000000, durationMin: 30, durationMax: 30,
+    },
+    {
+      slug: "security-audit",
+      category: "ADMIN_PAGE",
+      name: "보안 점검",
+      icon: "🛡️",
+      summary: "웹 서비스 취약점 점검 및 보안 강화",
+      description: "인증/인가, 입력값 검증, 주요 취약점(OWASP Top 10 등)을 점검하고 개선 방안을 적용합니다.",
+      capabilities: ["취약점 점검", "인증/인가 강화", "입력값 검증", "레이트 리미팅/로그"],
+      priceMin: 300000, priceMax: 3000000, durationMin: 3, durationMax: 14,
+    },
+    {
+      slug: "custom-development",
+      category: "CUSTOM",
+      name: "커스텀 개발",
+      icon: "✨",
+      summary: "위 카테고리에 없는 특수 요구사항 맞춤 개발",
+      description: "위 서비스 분류에 딱 맞지 않는 특수한 요구사항도 상담을 통해 범위와 견적을 협의하여 진행합니다.",
+      capabilities: ["요구사항 분석/컨설팅", "기술 스택 자유 선택", "맞춤 견적 산정"],
+      priceMin: 200000, priceMax: 20000000, durationMin: 1, durationMax: 90,
     },
   ];
 
@@ -307,6 +420,22 @@ async function main() {
     { category: "제작 과정", question: "수정 요청은 몇 번까지 가능한가요?", answer: "기본적으로 검수 단계에서 2회의 무료 수정을 지원하며, 추가 수정이나 큰 폭의 변경은 별도 협의가 필요할 수 있습니다." },
     { category: "납품", question: "소스코드도 함께 받을 수 있나요?", answer: "네, 완료된 프로젝트는 소스코드를 포함한 산출물을 버전별로 다운로드하실 수 있습니다." },
     { category: "기타", question: "회원가입 없이도 주문할 수 있나요?", answer: "네, 비회원으로도 주문이 가능합니다. 주문 시 설정한 PIN과 주문번호로 로그인 없이 진행 상황을 조회할 수 있습니다." },
+    { category: "주문/견적", question: "제작 기간은 보통 얼마나 걸리나요?", answer: "프로젝트 규모에 따라 다르지만, 랜딩페이지는 3~10일, 일반 웹사이트는 1~3주, 회원/결제가 포함된 웹서비스는 3주~2개월 정도가 일반적입니다. 정확한 기간은 정식 견적에 안내됩니다." },
+    { category: "주문/견적", question: "원하는 기능을 나중에 추가할 수 있나요?", answer: "네, 제작 도중이나 완료 후에도 기능 추가 요청이 가능합니다. 다만 범위가 커지면 별도 견적/일정 협의가 필요할 수 있습니다." },
+    { category: "주문/견적", question: "긴급하게 빨리 제작할 수도 있나요?", answer: "일정 조율이 가능한 경우 긴급 제작(급행)도 협의 가능하며, 작업 강도에 따라 추가 비용이 발생할 수 있습니다. 주문 시 희망 납기에 남겨주세요." },
+    { category: "주문/견적", question: "사용할 기술 스택을 지정할 수 있나요?", answer: "네, 특별히 원하는 프레임워크/언어가 있다면 상세 설명에 남겨주세요. 특별한 요청이 없으면 프로젝트에 적합한 기술 스택을 저희가 제안합니다." },
+    { category: "결제", question: "환불 정책은 어떻게 되나요?", answer: "제작 착수 전(계약금 입금 후 작업 시작 전) 취소 시 전액 환불됩니다. 작업이 진행된 이후에는 진행률에 따라 부분 환불되며, 자세한 기준은 견적 확정 시 안내드립니다." },
+    { category: "결제", question: "계약서를 따로 작성하나요?", answer: "일정 금액 이상의 프로젝트는 요청 시 간단한 용역 계약서(또는 견적서 확인 형태)를 작성해드립니다. 필요하시면 문의 남겨주세요." },
+    { category: "제작 과정", question: "진행 상황은 어떻게 확인하나요?", answer: "주문 상세 페이지에서 상태 타임라인과 진행률(%)을 실시간으로 확인할 수 있고, 담당자와 1:1 채팅으로 직접 소통할 수 있습니다." },
+    { category: "제작 과정", question: "상담은 어떤 방법으로 하나요?", answer: "주문 접수 전 궁금한 점은 1:1 문의 게시판을 이용해주세요. 주문 이후에는 해당 주문의 채팅으로 담당자와 바로 소통하실 수 있습니다." },
+    { category: "납품", question: "파일은 어떤 방식으로 전달되나요?", answer: "완성된 산출물은 주문 상세 페이지의 '산출물' 영역에서 버전별로 직접 다운로드할 수 있습니다. 별도의 이메일 전달은 하지 않습니다." },
+    { category: "납품", question: "배포/도메인 연결까지 해주시나요?", answer: "네, 요청 시 도메인 연결, 호스팅/서버 세팅, SSL 인증서 발급까지 지원합니다. 별도 서비스 항목으로도 신청 가능합니다." },
+    { category: "납품", question: "완성된 결과물의 저작권은 누구에게 있나요?", answer: "잔금 결제가 완료된 시점부터 결과물에 대한 저작권 및 소유권은 고객에게 이전됩니다. 자세한 조건은 계약서에 명시됩니다." },
+    { category: "납품", question: "납품 후 유지보수도 가능한가요?", answer: "네, 건별 유지보수 요청과 월 단위 정기 유지보수 계약 모두 지원합니다. '유지보수 정기계약' 서비스를 참고해주세요." },
+    { category: "기타", question: "게스트(비회원)로 주문하면 채팅도 이용할 수 있나요?", answer: "네, 비회원도 주문번호와 PIN으로 접속하면 담당자와 동일하게 채팅을 이용할 수 있습니다." },
+    { category: "기타", question: "견적은 어떤 기준으로 산정되나요?", answer: "제작 종류별 기본 금액에 선택한 기능(로그인, 결제, DB 연동 등)별 추가 금액을 더해 예상 범위를 계산합니다. 실제 최종 견적은 상세 요구사항 검토 후 확정됩니다." },
+    { category: "기타", question: "리뷰는 어떻게 남기나요?", answer: "완료된 주문의 상세 페이지에서 별점과 후기를 작성할 수 있습니다. 등록된 리뷰는 관리자 확인 후 공개됩니다." },
+    { category: "기타", question: "회원 탈퇴는 어떻게 하나요?", answer: "마이페이지에서 탈퇴를 요청하시면 처리해드립니다. 진행 중인 주문이 있는 경우 완료 후 탈퇴를 권장합니다." },
   ];
   for (const f of FAQS) {
     const exists = await prisma.faq.findFirst({ where: { question: f.question } });
@@ -316,255 +445,11 @@ async function main() {
   // ── 공지사항 ────────────────────────────────────────────────
   const NOTICES = [
     { category: "SERVICE", title: "CodeMaker 서비스 오픈 안내", content: "안녕하세요, CodeMaker입니다. 견적 계산부터 주문, 결제, 납품까지 한 번에 처리할 수 있는 플랫폼을 오픈했습니다. 많은 이용 부탁드립니다.", pinned: true },
-    { category: "EVENT", title: "오픈 기념 견적 상담 이벤트", content: "오픈 기념으로 이번 달 접수 건에 한해 무료 견적 상담을 진행합니다. 주문 신청 시 메모란에 '오픈이벤트'라고 남겨주세요.", pinned: false },
     { category: "MAINTENANCE", title: "서버 정기 점검 안내 (매주 화요일 새벽 4시)", content: "서비스 안정화를 위해 매주 화요일 새벽 4시~5시 사이 짧은 점검이 진행될 수 있습니다. 이용에 참고 부탁드립니다.", pinned: false },
   ];
   for (const n of NOTICES) {
     const exists = await prisma.notice.findFirst({ where: { title: n.title } });
     if (!exists) await prisma.notice.create({ data: n });
-  }
-
-  // ── 샘플 주문 (핵심 플로우 데모) ─────────────────────────────
-  const pinHashDefault = await bcrypt.hash("1234", 10);
-
-  async function ensureOrder(orderNo: string, factory: () => Promise<void>) {
-    const exists = await prisma.order.findUnique({ where: { orderNo } });
-    if (!exists) await factory();
-  }
-
-  // 주문 1: 방금 접수된 비회원 주문 (상태: 접수)
-  await ensureOrder("A-10001", async () => {
-    await prisma.order.create({
-      data: {
-        orderNo: "A-10001",
-        guestName: "박신청",
-        guestEmail: "guest1@example.com",
-        guestPhone: "010-2222-3333",
-        pinHash: pinHashDefault,
-        title: "동아리 홍보용 랜딩페이지 제작",
-        projectType: "WEBSITE",
-        description: "대학 동아리 홍보용 원페이지 랜딩페이지가 필요합니다. 모바일 반응형으로 부탁드립니다.",
-        features: JSON.stringify(["UPLOAD"]),
-        referenceUrls: JSON.stringify(["https://example.com/reference"]),
-        referenceImages: JSON.stringify([]),
-        attachments: JSON.stringify([]),
-        desiredTimeline: "2주 이내",
-        budget: "100만원 내외",
-        contactEmail: "guest1@example.com",
-        contactPhone: "010-2222-3333",
-        estimatedPriceMin: 700000,
-        estimatedPriceMax: 1100000,
-        estimatedDays: 8,
-        status: "접수",
-        statusHistory: { create: { status: "접수", note: "고객이 주문을 접수했습니다.", byAdmin: false } },
-      },
-    });
-  });
-
-  // 주문 2: 견적 승인 후 결제 대기 중 (회원)
-  await ensureOrder("A-10002", async () => {
-    const order = await prisma.order.create({
-      data: {
-        orderNo: "A-10002",
-        userId: customer!.id,
-        pinHash: pinHashDefault,
-        title: "쇼핑몰 관리자 페이지 기능 추가",
-        projectType: "WEBAPP",
-        description: "기존 쇼핑몰에 판매 통계 대시보드와 쿠폰 관리 기능을 추가하고 싶습니다.",
-        features: JSON.stringify(["ADMIN", "DB"]),
-        referenceImages: JSON.stringify([]),
-        attachments: JSON.stringify([]),
-        desiredTimeline: "3주",
-        budget: "300만원",
-        contactEmail: customerEmail,
-        contactPhone: "010-1234-5678",
-        estimatedPriceMin: 2400000,
-        estimatedPriceMax: 3600000,
-        estimatedDays: 18,
-        status: "결제대기",
-        statusHistory: {
-          create: [
-            { status: "접수", note: "고객이 주문을 접수했습니다.", byAdmin: false },
-            { status: "견적확인", note: "견적이 발송되었습니다.", byAdmin: true },
-            { status: "결제대기", note: "고객이 견적을 승인했습니다.", byAdmin: false },
-          ],
-        },
-      },
-    });
-    await prisma.quote.create({
-      data: {
-        orderId: order.id,
-        amount: 3000000,
-        estimatedDays: 18,
-        includedFeatures: JSON.stringify(["판매 통계 대시보드", "쿠폰 관리 CRUD", "관리자 권한 분리"]),
-        memo: "기존 DB 스키마 검토 후 확정된 견적입니다.",
-        status: "APPROVED",
-        sentAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2),
-        approvedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
-      },
-    });
-    await prisma.payment.create({ data: { orderId: order.id, amount: 3000000, status: "PENDING" } });
-  });
-
-  // 주문 3: 제작 중 (회원), 채팅 메시지 포함
-  await ensureOrder("A-10003", async () => {
-    const order = await prisma.order.create({
-      data: {
-        orderNo: "A-10003",
-        userId: customer!.id,
-        pinHash: pinHashDefault,
-        title: "디스코드 티켓 관리 봇 제작",
-        projectType: "BOT",
-        description: "서버 문의 접수를 위한 티켓 시스템 봇이 필요합니다. 티켓 생성/종료/로그 저장 기능을 원합니다.",
-        features: JSON.stringify(["DISCORD", "DB"]),
-        referenceImages: JSON.stringify([]),
-        attachments: JSON.stringify([]),
-        desiredTimeline: "2주",
-        budget: "80만원",
-        contactEmail: customerEmail,
-        contactDiscord: "codeuser#1234",
-        estimatedPriceMin: 500000,
-        estimatedPriceMax: 800000,
-        estimatedDays: 10,
-        status: "제작중",
-        progress: 45,
-        dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 6),
-        statusHistory: {
-          create: [
-            { status: "접수", note: "고객이 주문을 접수했습니다.", byAdmin: false },
-            { status: "견적확인", note: "견적이 발송되었습니다.", byAdmin: true },
-            { status: "결제대기", note: "고객이 견적을 승인했습니다.", byAdmin: false },
-            { status: "제작중", note: "입금이 확인되어 제작을 시작합니다.", byAdmin: true },
-          ],
-        },
-      },
-    });
-    await prisma.quote.create({
-      data: {
-        orderId: order.id,
-        amount: 650000,
-        estimatedDays: 10,
-        includedFeatures: JSON.stringify(["티켓 생성/종료", "로그 채널 저장", "관리자 명령어"]),
-        status: "APPROVED",
-        sentAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5),
-        approvedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4),
-      },
-    });
-    await prisma.payment.create({
-      data: {
-        orderId: order.id,
-        amount: 650000,
-        status: "CONFIRMED",
-        depositorName: "김코드",
-        notifiedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4),
-        confirmedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3),
-        confirmedBy: "최고관리자",
-      },
-    });
-    await prisma.message.create({
-      data: { orderId: order.id, senderType: "ADMIN", content: "안녕하세요! 티켓 봇 제작 시작했습니다. 우선 기본 명령어 구조부터 잡고 있습니다.", pinned: true, readByAdmin: true },
-    });
-    await prisma.message.create({
-      data: { orderId: order.id, senderType: "USER", userId: customer!.id, content: "네 감사합니다! 혹시 로그 채널은 서버별로 다르게 설정 가능한가요?", readByUser: true },
-    });
-    await prisma.message.create({
-      data: { orderId: order.id, senderType: "ADMIN", content: "네 가능합니다. 설정 명령어로 채널을 지정할 수 있게 만들고 있어요.", readByAdmin: true },
-    });
-  });
-
-  // 주문 4: 완료 (회원), 산출물 + 리뷰 포함
-  await ensureOrder("A-10004", async () => {
-    const order = await prisma.order.create({
-      data: {
-        orderNo: "A-10004",
-        userId: customer!.id,
-        pinHash: pinHashDefault,
-        title: "개인 포트폴리오 웹사이트 제작",
-        projectType: "WEBSITE",
-        description: "개발자 개인 포트폴리오 사이트 제작 요청드립니다. 다크모드와 블로그 기능이 있으면 좋겠습니다.",
-        features: JSON.stringify(["BOARD"]),
-        referenceImages: JSON.stringify([]),
-        attachments: JSON.stringify([]),
-        desiredTimeline: "2주",
-        budget: "120만원",
-        contactEmail: customerEmail,
-        estimatedPriceMin: 900000,
-        estimatedPriceMax: 1300000,
-        estimatedDays: 10,
-        status: "완료",
-        progress: 100,
-        statusHistory: {
-          create: [
-            { status: "접수", note: "고객이 주문을 접수했습니다.", byAdmin: false },
-            { status: "견적확인", note: "견적이 발송되었습니다.", byAdmin: true },
-            { status: "결제대기", note: "고객이 견적을 승인했습니다.", byAdmin: false },
-            { status: "제작중", note: "입금이 확인되어 제작을 시작합니다.", byAdmin: true },
-            { status: "검수중", note: "1차 산출물이 업로드되었습니다.", byAdmin: true },
-            { status: "완료", note: "최종 산출물이 승인되어 완료 처리되었습니다.", byAdmin: true },
-          ],
-        },
-      },
-    });
-    await prisma.quote.create({
-      data: {
-        orderId: order.id,
-        amount: 1100000,
-        estimatedDays: 10,
-        includedFeatures: JSON.stringify(["다크모드", "블로그(게시판)", "반응형 디자인"]),
-        status: "APPROVED",
-        sentAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 20),
-        approvedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 19),
-      },
-    });
-    await prisma.payment.create({
-      data: {
-        orderId: order.id,
-        amount: 1100000,
-        status: "CONFIRMED",
-        depositorName: "김코드",
-        notifiedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 19),
-        confirmedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 18),
-        confirmedBy: "최고관리자",
-      },
-    });
-    await prisma.deliverable.create({
-      data: {
-        orderId: order.id,
-        versionLabel: "Final",
-        fileKey: "deliverables/sample-final-readme.txt",
-        fileName: "portfolio-site-final.zip",
-        size: 128000,
-        note: "최종 납품 소스코드 (시드 데이터 - 실제 파일 아님)",
-        uploadedBy: "최고관리자",
-        visible: true,
-      },
-    });
-    await prisma.review.create({
-      data: {
-        userId: customer!.id,
-        orderId: order.id,
-        rating: 5,
-        content: "요청한 기능을 꼼꼼하게 반영해주시고 소통도 빠르셔서 만족스러웠습니다. 다음에도 또 맡기고 싶어요!",
-        status: "APPROVED",
-        adminReply: "좋은 후기 남겨주셔서 감사합니다! 다음 프로젝트도 잘 부탁드립니다 :)",
-        repliedAt: new Date(),
-      },
-    });
-  });
-
-  // ── 샘플 문의 ───────────────────────────────────────────────
-  const inquiryExists = await prisma.inquiry.findFirst({ where: { userId: customer!.id } });
-  if (!inquiryExists) {
-    await prisma.inquiry.create({
-      data: {
-        userId: customer!.id,
-        title: "결제 계좌 문의드립니다",
-        content: "무통장입금 시 입금자명이 주문자명과 다르면 확인이 늦어지나요?",
-        status: "ANSWERED",
-        answer: "입금자명이 다르더라도 주문번호 기준으로 대사하니 크게 걱정하지 않으셔도 됩니다. 다만 '입금 완료 알림' 시 입금자명을 정확히 남겨주시면 확인이 더 빨라집니다.",
-        answeredAt: new Date(),
-      },
-    });
   }
 
   // 필요한 업로드 디렉터리 미리 생성 (배포 환경에서 uploads/ 볼륨이 비어있어도 안전하게)
@@ -574,15 +459,10 @@ async function main() {
   for (const dir of ["references", "attachments", "deliverables", "messages", "revisions", "reviews", "portfolio"]) {
     await fs.mkdir(path.join(uploadRoot, dir), { recursive: true });
   }
-  await fs.writeFile(
-    path.join(uploadRoot, "deliverables", "sample-final-readme.txt"),
-    "이 파일은 시드 데이터용 더미 산출물입니다. 실제 납품 파일이 아닙니다."
-  );
 
   console.log("Seed complete.");
-  console.log(`Admin login: ${adminLoginId} / ${adminPassword}`);
-  console.log(`Customer login: ${customerEmail} / ${customerPassword}`);
-  console.log("Sample order numbers: A-10001 (PIN 1234, guest), A-10002/A-10003/A-10004 (customer account, PIN 1234)");
+  console.log(`Admin (Google-only login): ${adminLoginId} — email ${adminGoogleEmail}`);
+  console.log("No demo orders/customer/reviews are seeded — real activity only. Use /order/new (guest or logged-in) to create a real order.");
 }
 
 main()
