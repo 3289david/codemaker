@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { updateSettingsAction } from "@/lib/actions/adminContent";
 import { maskSecret } from "@/lib/settings";
 import { getAppOrigin } from "@/lib/appUrl";
-import { googleRedirectUri, githubRedirectUri } from "@/lib/oauth";
+import { googleRedirectUri, githubRedirectUri, discordRedirectUri } from "@/lib/oauth";
 
 export const dynamic = "force-dynamic";
 
@@ -99,6 +99,7 @@ export default async function AdminSettingsPage() {
           <div className="text-xs bg-neutral-50 border border-neutral-200 rounded-md p-3 space-y-1">
             <p>Google redirect URI: <code>{googleRedirectUri()}</code></p>
             <p>GitHub callback URL: <code>{githubRedirectUri()}</code></p>
+            <p>Discord redirect URI: <code>{discordRedirectUri()}</code></p>
             <p>현재 기준 origin: <code>{origin}</code> (환경변수 NEXT_PUBLIC_APP_ORIGIN)</p>
           </div>
           <p className="text-sm font-medium mt-2">Google</p>
@@ -107,6 +108,9 @@ export default async function AdminSettingsPage() {
           <p className="text-sm font-medium mt-2">GitHub</p>
           <input name="githubClientId" defaultValue={settings?.githubClientId ?? ""} placeholder="GitHub Client ID" className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm" />
           <SecretInput name="githubClientSecret" placeholder="GitHub Client Secret" currentValue={settings?.githubClientSecret} />
+          <p className="text-sm font-medium mt-2">Discord (봇과 같은 애플리케이션 ID 사용 가능)</p>
+          <input name="discordOAuthClientId" defaultValue={settings?.discordOAuthClientId ?? ""} placeholder="Discord OAuth Client ID" className="w-full border border-neutral-300 rounded-md px-3 py-2 text-sm" />
+          <SecretInput name="discordOAuthClientSecret" placeholder="Discord OAuth Client Secret" currentValue={settings?.discordOAuthClientSecret} />
         </section>
 
         <button className="bg-indigo-600 text-white text-sm font-medium px-6 py-2.5 rounded-md">저장</button>

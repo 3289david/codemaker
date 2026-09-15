@@ -339,7 +339,16 @@ async function main() {
   }
 
   // ── 포트폴리오 ──────────────────────────────────────────────
-  const PORTFOLIOS = [
+  const PORTFOLIOS: {
+    title: string;
+    category: string;
+    description: string;
+    techStack: string[];
+    duration: string;
+    priceBand: string;
+    features: string[];
+    liveUrl?: string;
+  }[] = [
     {
       title: "중고거래 커뮤니티 플랫폼",
       category: "WEBAPP",
@@ -347,7 +356,6 @@ async function main() {
       techStack: ["Next.js", "PostgreSQL", "Prisma", "Tailwind"],
       duration: "6주", priceBand: "800만원대",
       features: ["실시간 채팅", "위치 기반 검색", "결제 연동", "회원 등급"],
-      liveUrl: "https://example.com",
     },
     {
       title: "레이드 파티 매칭 디스코드 봇",

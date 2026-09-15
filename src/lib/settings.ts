@@ -39,6 +39,8 @@ export type AppSettings = {
   googleClientSecret: string;
   githubClientId: string;
   githubClientSecret: string;
+  discordOAuthClientId: string;
+  discordOAuthClientSecret: string;
 };
 
 export async function getSettings(): Promise<AppSettings> {
@@ -70,6 +72,9 @@ export async function getSettings(): Promise<AppSettings> {
     googleClientSecret: s?.googleClientSecret || process.env.GOOGLE_CLIENT_SECRET || "",
     githubClientId: s?.githubClientId || process.env.GITHUB_CLIENT_ID || "",
     githubClientSecret: s?.githubClientSecret || process.env.GITHUB_CLIENT_SECRET || "",
+    discordOAuthClientId:
+      s?.discordOAuthClientId || process.env.DISCORD_OAUTH_CLIENT_ID || process.env.DISCORD_CLIENT_ID || "",
+    discordOAuthClientSecret: s?.discordOAuthClientSecret || process.env.DISCORD_OAUTH_CLIENT_SECRET || "",
   };
 }
 

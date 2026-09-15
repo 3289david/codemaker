@@ -113,22 +113,20 @@ export async function exchangeGithubCode(code: string) {
 
 export async function getDiscordAuthUrl(state: string) {
   const settings = await getSettings();
-  // Discord는 봇과 OAuth 클라이언트가 같은 애플리케이션 ID를 공유한다.
-  const clientId = process.env.DISCORD_OAUTH_CLIENT_ID || process.env.DISCORD_CLIENT_ID || "";
   const params = new URLSearchParams({
-    client_id: clientId,
+    client_id: settings.discordOAuthClientId,
     redirect_uri: discordRedirectUri(),
     response_type: "code",
     scope: "identify email",
     state,
   });
-  void settings; // 예약: 추후 DB에서 client_id를 override할 경우를 대비
   return `https://discord.com/api/oauth2/authorize?${params.toString()}`;
 }
 
 export async function exchangeDiscordCode(code: string) {
-  const clientId = process.env.DISCORD_OAUTH_CLIENT_ID || process.env.DISCORD_CLIENT_ID || "";
-  const clientSecret = process.env.DISCORD_OAUTH_CLIENT_SECRET || "";
+  const settings = await getSettings();
+  const clientId = settings.discordOAuthClientId;
+  const clientSecret = settings.discordOAuthClientSecret;
 
   const tokenRes = await fetch("https://discord.com/api/oauth2/token", {
     method: "POST",

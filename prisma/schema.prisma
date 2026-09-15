@@ -432,6 +432,8 @@ model Setting {
   googleClientSecret String?
   githubClientId     String?
   githubClientSecret String?
+  discordOAuthClientId     String?
+  discordOAuthClientSecret String?
 
   updatedAt DateTime @default(now()) @updatedAt
 }

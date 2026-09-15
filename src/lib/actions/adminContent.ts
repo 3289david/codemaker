@@ -319,6 +319,7 @@ const SECRET_FIELDS = [
   "discordBotToken",
   "googleClientSecret",
   "githubClientSecret",
+  "discordOAuthClientSecret",
 ] as const;
 
 export async function updateSettingsAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -359,6 +360,8 @@ export async function updateSettingsAction(_prev: ActionState, formData: FormDat
     googleClientSecret: secret("googleClientSecret"),
     githubClientId: str("githubClientId") || null,
     githubClientSecret: secret("githubClientSecret"),
+    discordOAuthClientId: str("discordOAuthClientId") || null,
+    discordOAuthClientSecret: secret("discordOAuthClientSecret"),
   };
 
   await prisma.setting.upsert({
